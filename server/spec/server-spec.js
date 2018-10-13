@@ -15,12 +15,13 @@ describe('Persistent Node Chat Server', function() {
       database: 'chat'
     });
     dbConnection.connect();
-
-       var tablename = ""; // TODO: fill this out
+    console.log('here')
+       var messageName = "messages"; // TODO: fill this out
 
     /* Empty the db table before each test so that multiple tests
      * (or repeated runs of the tests) won't screw each other up: */
-    dbConnection.query('truncate ' + tablename, done);
+    dbConnection.query('truncate ' + messageName, done);
+    console.log('there')
   });
 
   afterEach(function() {
@@ -29,11 +30,13 @@ describe('Persistent Node Chat Server', function() {
 
   it('Should insert posted messages to the DB', function(done) {
     // Post the user to the chat server.
+    console.log('how')
     request({
       method: 'POST',
       uri: 'http://127.0.0.1:3000/classes/users',
       json: { username: 'Valjean' }
     }, function () {
+      console.log('why')
       // Post a message to the node chat server:
       request({
         method: 'POST',
@@ -50,6 +53,7 @@ describe('Persistent Node Chat Server', function() {
         // TODO: You might have to change this test to get all the data from
         // your message table, since this is schema-dependent.
         var queryString = 'SELECT * FROM messages';
+        console.log('HELOO')
         var queryArgs = [];
 
         dbConnection.query(queryString, queryArgs, function(err, results) {
