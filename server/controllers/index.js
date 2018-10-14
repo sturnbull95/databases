@@ -1,27 +1,48 @@
 var models = require('../models');
 
 module.exports = {
+
   messages: {
     get: function (req, res) {
-      models.message.get(req,res)
-    }, // a function which handles a get request for all messages
+      models.messages.get(function(err, results) {
+        if (err) { console.log(err)/* do something */ }
+        else{
+          console.log('success get message')
+          res.json(results);
+        }
+      });
+    },
     post: function (req, res) {
-      models.users.post(req.body.username,req.body.message,req.body.room)
-      res.send(req.body.username,req.body.message,req.body.room)
-    } // a function which handles posting a message to the database
+      var params = [req.body.message, req.body.username, req.body.roomname];
+      models.messages.post(params, function(err, results) {
+        if (err) { console.log(err)/* do something */ }
+
+        else{
+          console.log('success post message')
+          res.sendStatus(201);
+        }
+      });
+    }
   },
 
   users: {
-    // Ditto as above
     get: function (req, res) {
-      console.log('user get')
+      models.users.get(function(err, results) {
+        if (err) { console.log(err)/* do something */ }
+        else{
+          console.log('success get user')
+          res.json(results);
+        }
+      });
     },
     post: function (req, res) {
-      // INSERT INTO USER TABLE
-      console.log(req.body.username)
-      models.users.post(req.body.username,function(input){
-        res.send(input)
-      })
+      var params = [req.body.username];
+      models.users.post(params, function(err, results) {
+        if (err) { console.log(err)/* do something */ }
+        else{
+          res.sendStatus(201);
+        }
+      });
     }
   }
-};
+  };

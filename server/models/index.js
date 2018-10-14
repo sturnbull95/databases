@@ -1,54 +1,54 @@
 var db = require('../db');
 
 module.exports = {
+
   messages: {
     get: function (callback) {
-      var queryString = "SELECT m.id,m.message,r.name,u.name FROM messages m,rooms r, users u WHERE m.room_id = r.id AND m.user_id = u.id";
-      db.dbConnection.query(queryString,function(err,results){
+      // fetch all messages
+      // text, username, roomname, id
+      var queryStr = 'select messages.id, messages.text, messages.roomname, users.username \
+                      from messages left outer join users on (messages.userid = users.id) \
+                      order by messages.id desc';
+      db.query(queryStr, function(err, results) {
         if(err){
           console.log(err)
-        } else{
-          callback(null,results)
         }
-      })
-    }, // a function which produces all the messages
-    post: function (message,userID,roomID,callback) {
-      var queryString = "INSERT INTO messages (message,user_id,room_id) VALUES(@message + @userID + @roomID + )";
-      db.dbConnection.query(queryString,function(err,result){
-        if(err){
-          console.log(err)
-        } else{
-          console.log('success')
-          //callback(null,results)
-        }
-      })
-    } // a function which can be used to insert a message into the database
-  },
-
-  users: {
-    // Ditto as above.
-    get: function (callback) {
-      var queryString = "SELECT * FROM users";
-      db.dbConnection.query(queryString,function(err,results){
-        if(err){
-          console.log(err)
-        } else{
-          callback(null,results)
-        }
-      })
+        console.log(results)
+        callback(err, results);
+      });
     },
-    post: function (username,callback) {
-      console.log(username);
-      var queryString = "INSERT INTO users (name) VALUES("+ "'"+username+ "'"+")";
-      console.log(queryString)
-      db.dbConnection.query(queryString,function(err,result){
+    post: function (params, callback) {
+      // create a message for a user id based on the given username
+      var queryStr = 'insert into messages(text, userid, roomname) \
+                      value (?, (select id from users where username = ? limit 1), ?)';
+      db.query(queryStr, params, function(err, results) {
         if(err){
-          console.log(err);
-        } else{
-          console.log('success')
-          callback(null,result);
+          console.log(err)
         }
+        callback(err, results);
+      });
+    }
+  },
+  users: {
+    get: function (callback) {
+      // fetch all users
+      var queryStr = 'select * from users';
+      db.query(queryStr, function(err, results) {
+        if(err){
+          console.log(err)
+        }
+        callback(err, results);
+      });
+    },
+    post: function (params, callback) {
+      // create a user
+      var queryStr = 'insert into users(username) values (?)';
+      db.query(queryStr, params, function(err, results) {
+        if(err){
+          console.log(err)
+        }
+        callback(err, results);
       });
     }
   }
-};
+  };
